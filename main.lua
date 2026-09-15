@@ -103,6 +103,7 @@ local function text(parent, value, size, color, font)
 end
 
 local buttonRestColor = setmetatable({}, { __mode = "k" })
+local buttonFixedColor = setmetatable({}, { __mode = "k" })
 local function setButtonRestColor(control, color)
 	buttonRestColor[control] = color
 	control.BackgroundColor3 = color
@@ -122,6 +123,7 @@ local function button(parent, value)
 	controlStroke.Transparency = 0.1
 	buttonRestColor[control] = Library.Theme.Surface
 	control.MouseEnter:Connect(function()
+		if buttonFixedColor[control] then return end
 		local base = buttonRestColor[control] or Library.Theme.Surface
 		if base == Library.Theme.Enabled then
 			control.BackgroundColor3 = Color3.fromRGB(53, 190, 105)
@@ -130,11 +132,12 @@ local function button(parent, value)
 		end
 	end)
 	control.MouseLeave:Connect(function()
+		if buttonFixedColor[control] then return end
 		control.BackgroundColor3 = buttonRestColor[control] or Library.Theme.Surface
 	end)
 	local pressInput
 	control.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not buttonFixedColor[control] then
 			pressInput = input
 			tween(control, { BackgroundColor3 = Library.Theme.SurfaceHover }, 0.08)
 		end
@@ -449,6 +452,7 @@ function Library:CreateWindow(config)
 				local frame = row(config.Text or "Toggle")
 				local toggle = button(frame, value and (config.OnText or "ON") or (config.OffText or "OFF"))
 				toggle.Size, toggle.Position = UDim2.fromOffset(60, 28), UDim2.new(1, -70, 0.5, -14)
+				buttonFixedColor[toggle] = true
 				local toggleStroke = toggle:FindFirstChildOfClass("UIStroke")
 				local toggleGradient = toggleStroke and toggleStroke:FindFirstChildOfClass("UIGradient")
 				local object = {}
