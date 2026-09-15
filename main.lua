@@ -12,17 +12,17 @@ assert(player, "Run this UI from a LocalScript/executor client")
 
 local Library = {
 	Theme = {
-		Background = Color3.fromRGB(15, 12, 15),
-		Sidebar = Color3.fromRGB(25, 15, 19),
-		Surface = Color3.fromRGB(38, 21, 27),
-		SurfaceHover = Color3.fromRGB(58, 25, 35),
-		Control = Color3.fromRGB(30, 20, 24),
-		Accent = Color3.fromRGB(255, 72, 104),
-		AccentDark = Color3.fromRGB(139, 22, 48),
+		Background = Color3.fromRGB(36, 13, 21),
+		Sidebar = Color3.fromRGB(62, 18, 31),
+		Surface = Color3.fromRGB(76, 25, 40),
+		SurfaceHover = Color3.fromRGB(105, 32, 52),
+		Control = Color3.fromRGB(57, 20, 31),
+		Accent = Color3.fromRGB(255, 105, 132),
+		AccentDark = Color3.fromRGB(188, 38, 70),
 		Enabled = Color3.fromRGB(40, 168, 91),
-		Outline = Color3.fromRGB(100, 39, 55),
-		Text = Color3.fromRGB(255, 244, 247),
-		Muted = Color3.fromRGB(190, 145, 156),
+		Outline = Color3.fromRGB(166, 54, 79),
+		Text = Color3.fromRGB(255, 247, 249),
+		Muted = Color3.fromRGB(222, 168, 181),
 	},
 	_activeSlider = nil,
 }
@@ -54,9 +54,9 @@ end
 local function rubyGradient(parent, rotation)
 	local value = Instance.new("UIGradient")
 	value.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(92, 12, 34)),
-		ColorSequenceKeypoint.new(0.48, Color3.fromRGB(255, 62, 98)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(126, 13, 47)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(118, 22, 46)),
+		ColorSequenceKeypoint.new(0.48, Color3.fromRGB(245, 64, 98)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(166, 30, 61)),
 	})
 	value.Rotation = rotation or 0
 	value.Parent = parent
@@ -279,16 +279,12 @@ function Library:CreateWindow(config)
 	local width, height = config.Width or 760, config.Height or 500
 	local main = new("Frame", {
 		Name = "Main", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(width, height), BorderSizePixel = 0, BackgroundColor3 = self.Theme.Background,
+		Size = UDim2.fromOffset(width, height), BorderSizePixel = 0, BackgroundColor3 = Color3.new(1, 1, 1),
 	}, gui)
 	corner(main, 8)
 	outline(main, self.Theme.Outline, 1)
 	window.Main = main
-	rubyGradient(main, 35).Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0.82),
-		NumberSequenceKeypoint.new(0.55, 0.94),
-		NumberSequenceKeypoint.new(1, 0.86),
-	})
+	rubyGradient(main, 35)
 	local mobileScale = new("UIScale", { Name = "GhostPepperMainMobileScale", Scale = 1 }, main)
 	local function updateMobileScale()
 		local camera = workspace.CurrentCamera
@@ -315,19 +311,14 @@ function Library:CreateWindow(config)
 	workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() bindScaleCamera(workspace.CurrentCamera) end)
 	main.Visible = false
 
-	local header = new("Frame", { Name = "Header", Size = UDim2.new(1, 0, 0, 58), BackgroundColor3 = self.Theme.Sidebar, BorderSizePixel = 0 }, main)
+	local header = new("Frame", { Name = "Header", Size = UDim2.new(1, 0, 0, 58), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0 }, main)
 	corner(header, 8)
-	local headerGradient = rubyGradient(header, 8)
-	headerGradient.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0.68),
-		NumberSequenceKeypoint.new(0.5, 0.9),
-		NumberSequenceKeypoint.new(1, 0.72),
-	})
+	rubyGradient(header, 8)
 	local headerLine = new("Frame", { Size = UDim2.new(1, -20, 0, 1), Position = UDim2.new(0, 10, 1, -1), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0 }, header)
 	new("UIGradient", { Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(112, 12, 40)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 62, 98)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(136, 14, 48)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(132, 24, 50)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 92, 122)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(178, 34, 65)),
 	}) }, headerLine)
 	local logo = new("ImageLabel", { Name = "Logo", BackgroundTransparency = 1, Image = "rbxassetid://139877446989431", Size = UDim2.fromOffset(34, 34), Position = UDim2.fromOffset(14, 12), ScaleType = Enum.ScaleType.Fit }, header)
 	local title = text(header, config.Title or "GHOST PEPPER HUB", 16, self.Theme.Text, Enum.Font.GothamBold)
@@ -352,14 +343,9 @@ function Library:CreateWindow(config)
 	if reopenOutline then reopenOutline.Color, reopenOutline.Thickness = self.Theme.Accent, 2 end
 	new("ImageLabel", { BackgroundTransparency = 1, Image = "rbxassetid://139877446989431", Size = UDim2.fromOffset(30, 30), Position = UDim2.fromOffset(7, 7), ScaleType = Enum.ScaleType.Fit }, reopen)
 
-	local sidebar = new("Frame", { Name = "Sidebar", Position = UDim2.fromOffset(10, 68), Size = UDim2.new(0, 164, 1, -78), BackgroundColor3 = self.Theme.Sidebar, BorderSizePixel = 0 }, main)
+	local sidebar = new("Frame", { Name = "Sidebar", Position = UDim2.fromOffset(10, 68), Size = UDim2.new(0, 164, 1, -78), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0 }, main)
 	corner(sidebar, 7)
-	local sidebarGradient = rubyGradient(sidebar, 90)
-	sidebarGradient.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0.84),
-		NumberSequenceKeypoint.new(0.5, 0.96),
-		NumberSequenceKeypoint.new(1, 0.88),
-	})
+	rubyGradient(sidebar, 90)
 	local tabsTitle = text(sidebar, "TABS", 11, self.Theme.Muted, Enum.Font.GothamBold)
 	tabsTitle.Position, tabsTitle.Size = UDim2.fromOffset(14, 10), UDim2.new(1, -28, 0, 18)
 	local tabList = new("ScrollingFrame", { Position = UDim2.fromOffset(8, 35), Size = UDim2.new(1, -16, 1, -43), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = self.Theme.Accent, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new() }, sidebar)
