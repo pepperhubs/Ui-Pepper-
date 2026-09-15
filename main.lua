@@ -142,7 +142,13 @@ local function button(parent, value)
 	control.InputEnded:Connect(function(input)
 		if input == pressInput then
 			pressInput = nil
-			tween(control, { BackgroundColor3 = buttonRestColor[control] or Library.Theme.Surface }, 0.1)
+			-- O callback de clique troca o estado depois do InputEnded do controle.
+			-- Restaure no proximo ciclo para usar a cor nova, nao a anterior.
+			task.defer(function()
+				if control.Parent then
+					tween(control, { BackgroundColor3 = buttonRestColor[control] or Library.Theme.Surface }, 0.1)
+				end
+			end)
 		end
 	end)
 	return control
