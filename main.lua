@@ -12,17 +12,17 @@ assert(player, "Run this UI from a LocalScript/executor client")
 
 local Library = {
 	Theme = {
-		Background = Color3.fromRGB(23, 25, 29),
-		Sidebar = Color3.fromRGB(27, 29, 33),
-		Surface = Color3.fromRGB(33, 34, 38),
-		SurfaceHover = Color3.fromRGB(45, 48, 54),
-		Control = Color3.fromRGB(33, 36, 42),
-		Accent = Color3.fromRGB(161, 169, 225),
-		AccentDark = Color3.fromRGB(73, 77, 135),
+		Background = Color3.fromRGB(15, 12, 15),
+		Sidebar = Color3.fromRGB(25, 15, 19),
+		Surface = Color3.fromRGB(38, 21, 27),
+		SurfaceHover = Color3.fromRGB(58, 25, 35),
+		Control = Color3.fromRGB(30, 20, 24),
+		Accent = Color3.fromRGB(255, 72, 104),
+		AccentDark = Color3.fromRGB(139, 22, 48),
 		Enabled = Color3.fromRGB(40, 168, 91),
-		Outline = Color3.fromRGB(65, 69, 77),
-		Text = Color3.fromRGB(255, 255, 255),
-		Muted = Color3.fromRGB(165, 165, 165),
+		Outline = Color3.fromRGB(100, 39, 55),
+		Text = Color3.fromRGB(255, 244, 247),
+		Muted = Color3.fromRGB(190, 145, 156),
 	},
 	_activeSlider = nil,
 }
@@ -51,11 +51,25 @@ local function corner(object, radius)
 	return value
 end
 
+local function rubyGradient(parent, rotation)
+	local value = Instance.new("UIGradient")
+	value.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(92, 12, 34)),
+		ColorSequenceKeypoint.new(0.48, Color3.fromRGB(255, 62, 98)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(126, 13, 47)),
+	})
+	value.Rotation = rotation or 0
+	value.Parent = parent
+	return value
+end
+
 local function outline(object, color, thickness)
 	local value = Instance.new("UIStroke")
 	value.Color = color or Library.Theme.Outline
 	value.Thickness = thickness or 1
+	value.Transparency = 0.18
 	value.Parent = object
+	rubyGradient(value, 12)
 	return value
 end
 
@@ -100,11 +114,12 @@ local function button(parent, value)
 	-- and has no such restriction.
 	local control = new("TextLabel", {
 		Active = true, BorderSizePixel = 0, BackgroundColor3 = Library.Theme.Surface,
-		Text = value or "", TextColor3 = Library.Theme.Text, TextSize = 13, Font = Enum.Font.GothamMedium,
+		Text = value or "", TextColor3 = Library.Theme.Text, TextSize = 12, Font = Enum.Font.GothamSemibold,
 		TextXAlignment = Enum.TextXAlignment.Center,
 	}, parent)
-	corner(control, 7)
-	outline(control)
+	corner(control, 6)
+	local controlStroke = outline(control, Library.Theme.Outline, 1.15)
+	controlStroke.Transparency = 0.1
 	buttonRestColor[control] = Library.Theme.Surface
 	control.MouseEnter:Connect(function()
 		local base = buttonRestColor[control] or Library.Theme.Surface
@@ -116,6 +131,19 @@ local function button(parent, value)
 	end)
 	control.MouseLeave:Connect(function()
 		control.BackgroundColor3 = buttonRestColor[control] or Library.Theme.Surface
+	end)
+	local pressInput
+	control.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			pressInput = input
+			tween(control, { BackgroundColor3 = Library.Theme.SurfaceHover }, 0.08)
+		end
+	end)
+	control.InputEnded:Connect(function(input)
+		if input == pressInput then
+			pressInput = nil
+			tween(control, { BackgroundColor3 = buttonRestColor[control] or Library.Theme.Surface }, 0.1)
+		end
 	end)
 	return control
 end
@@ -256,6 +284,11 @@ function Library:CreateWindow(config)
 	corner(main, 8)
 	outline(main, self.Theme.Outline, 1)
 	window.Main = main
+	rubyGradient(main, 35).Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.82),
+		NumberSequenceKeypoint.new(0.55, 0.94),
+		NumberSequenceKeypoint.new(1, 0.86),
+	})
 	local mobileScale = new("UIScale", { Name = "GhostPepperMainMobileScale", Scale = 1 }, main)
 	local function updateMobileScale()
 		local camera = workspace.CurrentCamera
@@ -284,11 +317,17 @@ function Library:CreateWindow(config)
 
 	local header = new("Frame", { Name = "Header", Size = UDim2.new(1, 0, 0, 58), BackgroundColor3 = self.Theme.Sidebar, BorderSizePixel = 0 }, main)
 	corner(header, 8)
+	local headerGradient = rubyGradient(header, 8)
+	headerGradient.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.68),
+		NumberSequenceKeypoint.new(0.5, 0.9),
+		NumberSequenceKeypoint.new(1, 0.72),
+	})
 	local headerLine = new("Frame", { Size = UDim2.new(1, -20, 0, 1), Position = UDim2.new(0, 10, 1, -1), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0 }, header)
 	new("UIGradient", { Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(230, 186, 251)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(161, 169, 225)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(138, 201, 242)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(112, 12, 40)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 62, 98)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(136, 14, 48)),
 	}) }, headerLine)
 	local logo = new("ImageLabel", { Name = "Logo", BackgroundTransparency = 1, Image = "rbxassetid://139877446989431", Size = UDim2.fromOffset(34, 34), Position = UDim2.fromOffset(14, 12), ScaleType = Enum.ScaleType.Fit }, header)
 	local title = text(header, config.Title or "GHOST PEPPER HUB", 16, self.Theme.Text, Enum.Font.GothamBold)
@@ -300,6 +339,8 @@ function Library:CreateWindow(config)
 
 	local close = button(header, "X")
 	close.Size, close.Position = UDim2.fromOffset(30, 28), UDim2.new(1, -38, 0, 14)
+	close.TextColor3 = self.Theme.Accent
+	setButtonRestColor(close, Color3.fromRGB(43, 18, 26))
 
 	local reopen = button(gui, "")
 	reopen.Name, reopen.Visible, reopen.Size = "Reopen", true, UDim2.fromOffset(44, 44)
@@ -313,6 +354,12 @@ function Library:CreateWindow(config)
 
 	local sidebar = new("Frame", { Name = "Sidebar", Position = UDim2.fromOffset(10, 68), Size = UDim2.new(0, 164, 1, -78), BackgroundColor3 = self.Theme.Sidebar, BorderSizePixel = 0 }, main)
 	corner(sidebar, 7)
+	local sidebarGradient = rubyGradient(sidebar, 90)
+	sidebarGradient.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.84),
+		NumberSequenceKeypoint.new(0.5, 0.96),
+		NumberSequenceKeypoint.new(1, 0.88),
+	})
 	local tabsTitle = text(sidebar, "TABS", 11, self.Theme.Muted, Enum.Font.GothamBold)
 	tabsTitle.Position, tabsTitle.Size = UDim2.fromOffset(14, 10), UDim2.new(1, -28, 0, 18)
 	local tabList = new("ScrollingFrame", { Position = UDim2.fromOffset(8, 35), Size = UDim2.new(1, -16, 1, -43), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 3, ScrollBarImageColor3 = self.Theme.Accent, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new() }, sidebar)
@@ -358,7 +405,9 @@ function Library:CreateWindow(config)
 	function window:SelectTab(tab)
 		for _, other in pairs(self.Tabs) do
 			other.Page.Visible = other == tab
-			other.Button.BackgroundColor3 = other == tab and Library.Theme.AccentDark or Library.Theme.Surface
+			other.Indicator.Visible = other == tab
+			setButtonRestColor(other.Button, other == tab and Library.Theme.AccentDark or Library.Theme.Surface)
+			other.Button.TextColor3 = other == tab and Library.Theme.Text or Library.Theme.Muted
 		end
 		self.Selected = tab
 	end
@@ -368,8 +417,13 @@ function Library:CreateWindow(config)
 		local tab = { Name = name, Sections = {} }
 		local tabButton = button(tabList, name)
 		tabButton.Size, tabButton.LayoutOrder = UDim2.new(1, 0, 0, 38), tabOrder
+		tabButton.TextXAlignment = Enum.TextXAlignment.Left
+		new("UIPadding", { PaddingLeft = UDim.new(0, 15), PaddingRight = UDim.new(0, 8) }, tabButton)
+		local indicator = new("Frame", { Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.new(1, 1, 1), Position = UDim2.new(0, 5, 0.5, -10), Size = UDim2.fromOffset(3, 20) }, tabButton)
+		corner(indicator, 2)
+		rubyGradient(indicator, 90)
 		tabOrder += 1
-		tab.Button = tabButton
+		tab.Button, tab.Indicator = tabButton, indicator
 		local page = new("ScrollingFrame", { Name = name .. "Page", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 4, ScrollBarImageColor3 = Library.Theme.Accent, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), Visible = false }, pageHolder)
 		new("UIListLayout", { Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder }, page)
 		tab.Page = page
@@ -428,7 +482,7 @@ function Library:CreateWindow(config)
 				corner(box, 6); outline(box)
 				local track = new("Frame", { Active = true, BackgroundColor3 = Library.Theme.Background, BorderSizePixel = 0, Position = UDim2.fromOffset(13, 42), Size = UDim2.new(1, -26, 0, 6) }, frame)
 				corner(track, 4)
-				local fill = new("Frame", { BackgroundColor3 = Library.Theme.Accent, BorderSizePixel = 0, Size = UDim2.new(0, 0, 1, 0) }, track); corner(fill, 4)
+				local fill = new("Frame", { BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0, Size = UDim2.new(0, 0, 1, 0) }, track); corner(fill, 4); rubyGradient(fill, 0)
 				local knob = new("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0, 0, 0.5, 0), Size = UDim2.fromOffset(12, 12), BackgroundColor3 = Library.Theme.Text, BorderSizePixel = 0 }, track); corner(knob, 9); outline(knob)
 				local object = {}
 				local function format(number) return number % 1 == 0 and tostring(math.floor(number)) or string.format("%.2f", number):gsub("0+$", ""):gsub("%.$", "") end
@@ -449,7 +503,8 @@ function Library:CreateWindow(config)
 
 			function section:AddButton(config)
 				config = config or {}; local control = button(body, config.Text or "Button")
-				control.Size = UDim2.new(1, 0, 0, 38)
+				control.Size = UDim2.new(1, 0, 0, 36)
+				setButtonRestColor(control, Library.Theme.AccentDark)
 				clicked(control, function() if config.Callback then config.Callback() end end)
 				return control
 			end
@@ -503,7 +558,7 @@ function Library:CreateWindow(config)
 						count = value ~= nil and 1 or 0
 					end
 					local active = count > 0 and not optionColors
-					setButtonRestColor(select, active and Library.Theme.Enabled or Library.Theme.Surface)
+					setButtonRestColor(select, active and Library.Theme.AccentDark or Library.Theme.Surface)
 					local stroke = select:FindFirstChildOfClass("UIStroke")
 					if stroke then stroke.Enabled = not active end
 				end
@@ -512,7 +567,7 @@ function Library:CreateWindow(config)
 					for option, choice in pairs(choiceButtons) do
 						local isSelected = (multi and selected[option] == true) or ((not multi) and value == option)
 						local rarityColor = optionColors and optionColors[option]
-						setButtonRestColor(choice, (isSelected and not optionColors) and Library.Theme.Enabled or Library.Theme.Surface)
+						setButtonRestColor(choice, (isSelected and not optionColors) and Library.Theme.AccentDark or Library.Theme.Surface)
 						local stroke = choice:FindFirstChildOfClass("UIStroke")
 						if stroke then stroke.Enabled = optionColors ~= nil or not isSelected end
 						choice.TextColor3 = rarityColor or Library.Theme.Text
