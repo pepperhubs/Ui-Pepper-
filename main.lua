@@ -443,11 +443,15 @@ function Library:CreateWindow(config)
 				local frame = row(config.Text or "Toggle")
 				local toggle = button(frame, value and (config.OnText or "ON") or (config.OffText or "OFF"))
 				toggle.Size, toggle.Position = UDim2.fromOffset(60, 28), UDim2.new(1, -70, 0.5, -14)
+				local toggleStroke = toggle:FindFirstChildOfClass("UIStroke")
+				local toggleGradient = toggleStroke and toggleStroke:FindFirstChildOfClass("UIGradient")
 				local object = {}
 				function object:Set(nextValue, silent)
 					value = nextValue == true
 					toggle.Text = value and (config.OnText or "ON") or (config.OffText or "OFF")
 					setButtonRestColor(toggle, value and Library.Theme.Enabled or Library.Theme.AccentDark)
+					if toggleGradient then toggleGradient.Enabled = not value end
+					if toggleStroke then toggleStroke.Color = value and Library.Theme.Enabled or Library.Theme.Accent end
 					if not silent and config.Callback then config.Callback(value) end
 				end
 				function object:Get() return value end
