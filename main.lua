@@ -405,7 +405,7 @@ function Library:CreateWindow(config)
 		tabButton.Size, tabButton.LayoutOrder = UDim2.new(1, 0, 0, 38), tabOrder
 		tabButton.TextXAlignment = Enum.TextXAlignment.Left
 		new("UIPadding", { PaddingLeft = UDim.new(0, 15), PaddingRight = UDim.new(0, 8) }, tabButton)
-		local indicator = new("Frame", { Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.new(1, 1, 1), Position = UDim2.new(0, 5, 0.5, -10), Size = UDim2.fromOffset(3, 20) }, tabButton)
+		local indicator = new("Frame", { Visible = false, BorderSizePixel = 0, BackgroundColor3 = Color3.new(1, 1, 1), Position = UDim2.new(0, -10, 0.5, -10), Size = UDim2.fromOffset(3, 20) }, tabButton)
 		corner(indicator, 2)
 		rubyGradient(indicator, 90)
 		tabOrder += 1
